@@ -1,5 +1,6 @@
 
 import java.io.PrintStream;
+import java.io.File;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,28 +11,29 @@ public class bib {
     public static void main(String[] args) {
 
         try {
-            if (args.length == 0) {
-                System.out.println("Missing argument");
-                System.exit(0);
-            }
+            
+            File input = new File("input.html");
 
-            String cite = args[0];
-            String desc = args[1];
+            //String cite = "MsoBibliography";
+            //String desc = "Bibliography2";
+            
+            String cite = "AnnotatedBiblio";
+            String desc = "2AnnotatedBiblio";
 
-            Document localDocument = Jsoup.parse(args[2]);
+            Document localDocument = Jsoup.parse(input, null);
 
             if (localDocument != null) {
 
-                Elements localElements1 = localDocument.select("p[class='" + cite + "']:has(span)");
-                Elements localElements2 = localDocument.select("p[class='" + desc + "']");
+                Elements elemCite = localDocument.select("p[class='" + cite + "']:has(span)");
+                Elements elemDesc = localDocument.select("p[class='" + desc + "']");
 
-                if ((localElements1.size() != 0) && (localElements2.size() != 0)) {
-                    if (localElements1.size() == localElements2.size()) {
+                if ((elemCite.size() != 0) && (elemDesc.size() != 0)) {
+                    if (elemCite.size() == elemDesc.size()) {
                         System.out.print("<ul>");
-                        for (int i = 0; i < localElements1.size(); i++) {
+                        for (int i = 0; i < elemCite.size(); i++) {
                             System.out.print("<li>");
                             System.out.print("<p>");
-                            for (Element localElement : ((Element) localElements1.get(i)).children()) {
+                            for (Element localElement : ((Element) elemCite.get(i)).children()) {
                                 if ((!localElement.attr("style").contains("mso-bidi-font-weight:normal")) && (!localElement.attr("style").contains("style='mso-tab-count"))) {
                                     if (localElement.tagName() == "i") {
                                         System.out.print("<em>");
@@ -44,7 +46,7 @@ public class bib {
                             }
                             System.out.print("</p>");
 
-                            System.out.print(String.format("<blockquote><p>%s</p></blockquote>", new Object[]{((Element) localElements2.get(i)).text()}));
+                            System.out.print(String.format("<blockquote><p>%s</p></blockquote>", new Object[]{((Element) elemDesc.get(i)).text()}));
                             System.out.print("</li>");
                         }
                         System.out.println("</ul>");
@@ -52,6 +54,8 @@ public class bib {
                         System.out.println("Odd number of elements.");
                     }
                 } else {
+                    System.out.println(elemCite.size());
+                    System.out.println(elemDesc.size());
                     System.out.println("No elements found.");
                 }
             } else {
